@@ -1,7 +1,11 @@
 <?php
+// Live
+// $keyId = 'rzp_live_NBCjFGtgL5ANF9';
+// $keySecret = 'KfiLy99cNiQp2V494fphgsVf';
 
-$keyId = 'rzp_live_NBCjFGtgL5ANF9';
-$keySecret = 'KfiLy99cNiQp2V494fphgsVf';
+// Test
+$keyId = 'rzp_test_vPnSkbsrcRe4lJ';
+$keySecret = 'KqEir06dINftge5ckBYdGFVt';
 $displayCurrency = 'INR';
 
 //These should be commented out in production
