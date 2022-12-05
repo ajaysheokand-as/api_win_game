@@ -77,6 +77,77 @@ function cal_price($number, $amt){
     }
 }
 
+function update_won_amount($user_id, $won_amount,$conn, $won_no){
+    $user = "SELECT amount FROM users WHERE id = $user_id";
+    if($balance = mysqli_query($conn, $user)){
+        while ($row = mysqli_fetch_assoc($balance)){
+            $balance_amount = $row['amount'];
+        }
+        $final_amount = $balance_amount + $won_amount;
+    }
+    $sql = "UPDATE `users` SET `amount`=$final_amount WHERE id = $user_id";
+                        if(mysqli_query($conn, $sql)){
+                            return array( "won_number" => $won_no,
+                                          "won_amount" => $won_amount,
+                                          "final_amount"=> $final_amount);
+                            }   
+}
+
+function insert_amt(array $numbers, $won_no, $period_no, $conn){
+
+    foreach($numbers as $number){
+        if($number == 11){
+            $sql = "SELECT * FROM orders WHERE number = $number OR number = 5 and period_no = $period_no";
+            $result = mysqli_query($conn, $sql);
+        }elseif($number == 12){
+            $sql = "SELECT * FROM orders WHERE number = $number OR number = 0 and period_no = $period_no";
+            $result = mysqli_query($conn, $sql);
+        }else{
+            $sql = "SELECT * FROM orders WHERE number = $number and period_no = $period_no";
+            $result = mysqli_query($conn, $sql);
+        }
+        
+        if($result){
+            while ($row = mysqli_fetch_assoc($result)) {
+                $user_id = $row['user_id'];
+                $amount = $row['amount'];
+                if($row == 1){
+                    if($number == 10){
+                        $won_amount = $amount * 4.5;
+                        update_won_amount($user_id, $won_amount,$conn, $won_no);
+                    }elseif($number == 11){
+                        $won_amount = $amount * 2;
+                        return update_won_amount($user_id, $won_amount,$conn, $won_no);    
+                    }elseif($number == 12){
+                        $won_amount = $amount * 2;
+                        return update_won_amount($user_id, $won_amount,$conn, $won_no);   
+                    }else{
+                        $won_amount = $amount * 9;
+                        return update_won_amount($user_id, $won_amount,$conn, $won_no); 
+                    }
+                }else{
+                    if($number == 11){
+                        $won_amount = $amount * 2;
+                        return update_won_amount($user_id, $won_amount,$conn, $won_no);
+                    }elseif($number == 12){
+                        $won_amount = $amount * 2;
+                        return update_won_amount($user_id, $won_amount,$conn, $won_no);
+                    }elseif($number == 5){
+                        $won_amount = $amount * 1.5;
+                        return update_won_amount($user_id, $won_amount,$conn, $won_no);
+                    }elseif($number == 0){
+                        $won_amount = $amount * 1.5;
+                        return update_won_amount($user_id, $won_amount,$conn, $won_no);
+
+                    }
+                }
+                
+            }
+            
+        }
+    }
+}
+
 try {
     switch ($method) {
         case "GET":
@@ -86,14 +157,20 @@ try {
                 $result = mysqli_query($conn, $sql);
                 if ($result) {
                     while ($row = mysqli_fetch_assoc($result)) {
-                       
                         cal_price($row['number'], $row['amount']);
                     }
                     $arr = array($GLOBALS['zero'], $GLOBALS['one'],$GLOBALS['two'],$GLOBALS['three'],$GLOBALS['four'],$GLOBALS['five'],$GLOBALS['six'],$GLOBALS['seven'],$GLOBALS['eight'],$GLOBALS['nine']);
                     $min_price = min($GLOBALS['zero'], $GLOBALS['one'],$GLOBALS['two'],$GLOBALS['three'],$GLOBALS['four'],$GLOBALS['five'],$GLOBALS['six'],$GLOBALS['seven'],$GLOBALS['eight'],$GLOBALS['nine']);
                     for($i=0; $i<=9;$i++){
                         if($arr[$i]===$min_price){
-                            $response = $i;
+                            if($i == 0 || $i == 5){
+                                $response =  insert_amt(array(0,5,10), $i, $period_no, $conn);
+                            }elseif($i == 1 || $i == 3 || $i == 7 || $i == 9){
+                                $response = insert_amt(array(1,3,7,9,11), $i, $period_no, $conn);
+                            }elseif($i == 2 || $i == 4 || $i == 6 || $i == 8){
+                                $response = insert_amt(array(2,4,6,8,12), $i, $period_no, $conn);
+                            }
+                            
                             break;
                         }
                     }
@@ -111,6 +188,3 @@ try {
 } catch (Exception $e) {
     send_api_res($response, $e->getMessage());
 }
-
-
-?>
