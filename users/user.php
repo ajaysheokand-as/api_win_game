@@ -9,7 +9,7 @@ $pass = "";
 $token = "";
 $device_type = "";
 
-function create_user(){
+function create_user($data){
     global $conn, $err, $response;
     if (isset($data['name']) && isset($data['mobile_no']) && isset($data['email']) && isset($data['password'])) {
         $name = $data['name'];
@@ -85,7 +85,8 @@ switch ($method) {
            login_user($data);
         }
         if($type == "sign_in"){
-            create_user();
+
+            create_user($data);
         }
         break;
     case "GET":
