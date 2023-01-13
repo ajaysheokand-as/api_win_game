@@ -9,9 +9,9 @@ $pass = "";
 $token = "";
 $device_type = "";
 
-    $zero = 7000;
-    $one = 500;
-    $two = 60000;
+    $zero = 0;
+    $one = 0;
+    $two = 0;
     $three = 0;
     $four = 0;
     $five = 0;
