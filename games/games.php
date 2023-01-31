@@ -70,6 +70,6 @@ switch($method){
     case "GET":{
         fetch_game($conn);
     }
-}
+}   
 
 send_api_res($response, $err);

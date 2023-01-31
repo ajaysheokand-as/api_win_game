@@ -19,6 +19,7 @@ $device_type = "";
     $seven = 0;
     $eight = 0;
     $nine = 0;
+    $balance_amount = 0;
 
     // $smallestNumber[10] = array();
 
@@ -78,18 +79,20 @@ function cal_price($number, $amt){
 }
 
 function update_won_amount($user_id, $won_amount,$conn, $won_no){
+    
     $user = "SELECT amount FROM users WHERE id = $user_id";
     if($balance = mysqli_query($conn, $user)){
         while ($row = mysqli_fetch_assoc($balance)){
-            $balance_amount = $row['amount'];
+            $GLOBALS['balance_amount'] = $row['amount'];
         }
-        $final_amount = $balance_amount + $won_amount;
+        $final_amount = $GLOBALS['balance_amount'] + $won_amount;
     }
     $sql = "UPDATE `users` SET `amount`=$final_amount WHERE id = $user_id";
                         if(mysqli_query($conn, $sql)){
                             return array( "won_number" => $won_no,
                                           "won_amount" => $won_amount,
-                                          "final_amount"=> $final_amount);
+                                          "final_amount"=> $final_amount,
+                                         "user_id" => $user_id);
                             }   
 }
 

@@ -21,6 +21,7 @@ function create_transaction($conn,$data){
                 if ($result = mysqli_query($conn, $sql)) {
                     $response = array(
                         "success" => true,
+                        "message" => "Amount Added Successfully",
                         "error" => ""
                     );
                 } else
@@ -29,14 +30,44 @@ function create_transaction($conn,$data){
     $err = "Enter Data in all field";
 }
 
-function update_transaction($conn, $id){
+function update_transaction($conn, $id,$status){
     global $err, $response;
-    $sql = "UPDATE `transaction` SET `status`=1 WHERE id=$id";
+    $sql = "UPDATE `transaction` SET `status`= $status WHERE id= $id";
     if ($update_result = mysqli_query($conn, $sql)) {
         $response = array(
             "success" => true,
             "error" => ""
         );
+    } else
+        $err = mysqli_error($conn);
+}
+
+function get_transaction($conn,$status){
+    global $err, $response;
+    if($status == -1){
+        $sql = "SELECT `transaction`.*, `users`.`name` FROM `transaction` , `users` WHERE users.id = transaction.userid;";
+    }else{
+        $sql = "SELECT `transaction`.*, `users`.`name` FROM `transaction` , `users` WHERE transaction.status = $status AND users.id = transaction.userid;";
+    }
+    if ($all_transaction = mysqli_query($conn, $sql)) {
+        $data = [];
+        while ($row = mysqli_fetch_assoc($all_transaction)) {
+            $data[] = $row;
+        }
+        if(!empty($data)){
+            $response = array(
+                "success" => true,
+                "data" => $data,
+                "error" => ""
+            );
+        }else{
+            $response = array(
+                "success" => true,
+                "data" => "No Data Found",
+                "error" => ""
+            );
+        }
+        
     } else
         $err = mysqli_error($conn);
 }
@@ -51,8 +82,14 @@ switch($method){
         $data = json_decode(file_get_contents('php://input'), true);
         if (isset($data['id'])) {
             $id = $data['id'];
-            update_transaction($conn,$id);
+            $status = $data['status'];
+            update_transaction($conn, $id,$status);
         }
+        break;
+    }
+    case "GET":{
+        $status = $_GET["status"];
+        get_transaction($conn,$status);
     }
 }
 
