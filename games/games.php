@@ -1,6 +1,7 @@
-<?php 
+<?php
 require_once('../config.php');
 require_once('../functions.php');
+require_once('./function.php');
 
 $method = $_SERVER['REQUEST_METHOD'];
 $response = "";
@@ -10,7 +11,8 @@ $token = "";
 $device_type = "";
 
 
-function create_game($conn,$data){
+function create_game($conn, $data)
+{
     global $err, $response;
     if (isset($data['period_no']) && isset($data['is_active'])) {
         $period_no = $data['period_no'];
@@ -18,14 +20,16 @@ function create_game($conn,$data){
         $end_time = $data['end_time'];
         $is_active = $data['is_active'];
 
-                $sql = "INSERT INTO `games`(`period_no`, `start_time`, `end_time`, `is_active`) VALUES ('$period_no','$start_time','$end_time','$is_active')";
-                if ($result = mysqli_query($conn, $sql)) {
-                    $response = array(
-                        "success" => true,
-                        "error" => ""
-                    );
-                } else $err = mysqli_error($conn);
-    } else $err = "Enter data in all field";
+        $sql = "INSERT INTO `games`(`period_no`, `start_time`, `end_time`, `is_active`) VALUES ('$period_no','$start_time','$end_time','$is_active')";
+        if ($result = mysqli_query($conn, $sql)) {
+            $response = array(
+                "success" => true,
+                "error" => ""
+            );
+        } else
+            $err = mysqli_error($conn);
+    } else{
+    $response = createNewMatch($conn);}
 }
 
 // function update_game($conn, $id){
@@ -40,22 +44,10 @@ function create_game($conn,$data){
 //         $err = mysqli_error($conn);
 // }
 
-function fetch_game($conn){
-    global $err, $response;
-    $sql = "SELECT * FROM `games` WHERE is_active = 1 ORDER BY create_at DESC";
-    if ($game = mysqli_query($conn, $sql)) {
-        $game_data = mysqli_fetch_assoc($game);
-        $response = array(
-            "success" => true,
-            "data" => $game_data,
-            "error" => ""
-        );
-    } else
-        $err = mysqli_error($conn);
-}
 
-switch($method){
-    case "POST":{
+
+switch ($method) {
+    case "POST": {
             $data = json_decode(file_get_contents('php://input'), true);
             create_game($conn, $data);
             break;
@@ -67,9 +59,9 @@ switch($method){
     //         update_game($conn,$id);
     //     }
     // }
-    case "GET":{
-        fetch_game($conn);
-    }
-}   
+    case "GET": {
+            fetch_game($conn);
+        }
+}
 
 send_api_res($response, $err);

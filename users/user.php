@@ -49,7 +49,7 @@ function login_user($data){
                         $id = $row["id"];
                         $last_login = $_SERVER["REQUEST_TIME"];
                         $device = $_SERVER["SERVER_ADDR"];
-                        $platform = $_SERVER["HTTP_SEC_CH_UA_PLATFORM"];
+                        $platform = isset($_SERVER["HTTP_SEC_CH_UA_PLATFORM"]) ? $_SERVER["HTTP_SEC_CH_UA_PLATFORM"] : "";
                         $user_data =array("mobile_no"=>$mobile_no, "id"=>$id, "name"=>$name);
                         $token = create_jwt_token($user_data);
                         if($token !== null ){
